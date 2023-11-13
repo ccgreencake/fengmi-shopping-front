@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" style="margin-top: 15px;">
-       <el-col class="goods-show" :offset="3" :span="18" v-for="(product,index) in products" :key="index">
-            <el-card :body-style="style">
+       <el-col class="goods-show" :offset="3" :span="18" >
+            <el-card :body-style="style" v-for="(product,index) in products" :key="index">
                 <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image">
                 <div style="padding: 14px;">
                     <span>{{ product.productName }}</span>
