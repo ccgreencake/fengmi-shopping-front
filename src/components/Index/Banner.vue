@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import { getList } from '@/api/category'
 export default {
     data: () => ({
         isShowDetail: false
@@ -80,8 +81,16 @@ export default {
             this.$router.push({
                 path:'/search'
             })
-        }
-    }
+        },
+      getCategory(){
+        getList().then(response => {
+            window.console.log(response)
+          })
+      }
+    },
+  mounted() {
+    this.getCategory()
+  }
 }
 </script>
 
