@@ -60,7 +60,7 @@ export default {
       getIndexImg(){
           let _this = this;
           getIndexImgList().then(response => {
-            window.console.log(response);
+            // window.console.log(response);
             _this.indexImgList = response.data;
           })
       }
