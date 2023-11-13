@@ -7,7 +7,7 @@
                 <div style="padding: 14px;">
                     <span>{{ product.productName }}</span>
                     <div class="bottom clearfix">
-                        <time class="time">2021-10-31</time>
+                        <time class="time">{{ product.updateTime }}</time>
                         <el-button type="text" class="button">操作按钮</el-button>
                     </div>
                 </div>
@@ -28,7 +28,7 @@ export default {
        getProduct(){
          let _this = this;
          getProductList().then(response => {
-             // window.console.log(response.data);
+             window.console.log(response.data);
              _this.products = response.data;
          })
        }
