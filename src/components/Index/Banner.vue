@@ -2,21 +2,7 @@
     <el-row :gutter="20" style="box-sizing: border-box; margin-right: 0px;">
         <el-col :span="4" :offset="3">
             <ul class="menus is-always-shadow" @mouseleave="hideDetail">
-                <li @mouseenter="showDetail">家用电器</li>
-                <li @mouseenter="showDetail">手机 / 运营商 / 数码数码数码</li>
-                <li @mouseenter="showDetail">电脑 / 办公</li>
-                <li @mouseenter="showDetail">男鞋 / 运动 / 户外</li>
-                <li @mouseenter="showDetail">家居 / 家具 / 家装 / 厨具</li>
-                <li @mouseenter="showDetail">美妆 / 个人清洁 / 宠物</li>
-                <li @mouseenter="showDetail">女鞋 / 箱包 / 钟表</li>
-                <li @mouseenter="showDetail">房产 / 汽车 / 汽车用品</li>
-                <li @mouseenter="showDetail">艺术 / 礼品鲜花 / 农资绿植</li>
-                <li @mouseenter="showDetail">机票 / 酒店 / 旅游 / 生活</li>
-                <li @mouseenter="showDetail">医药保健 / 计生情趣</li>
-                <li @mouseenter="showDetail">图书 / 酒店 / 旅游 / 生活</li>
-                <li @mouseenter="showDetail">机票 / 文娱 / 教育 / 电子书</li>
-                <li @mouseenter="showDetail">理财 / 众筹 / 白条 / 保险</li>
-                <li @mouseenter="showDetail">安装 / 维修 / 清洗 / 二手</li>
+                <li @mouseenter="showDetail" v-for="(category,index) in categories" :key="index">{{ category.categoryName }}</li>
             </ul>
         </el-col>
         <el-col :span="13" style="position: relative;">
@@ -66,7 +52,8 @@
 import { getList } from '@/api/category'
 export default {
     data: () => ({
-        isShowDetail: false
+        isShowDetail: false,
+      categories:[]
     }),
     components: {
     },
@@ -83,8 +70,10 @@ export default {
             })
         },
       getCategory(){
+          let _this = this;
         getList().then(response => {
-            window.console.log(response)
+            window.console.log(response);
+            _this.categories = response.data;
           })
       }
     },
