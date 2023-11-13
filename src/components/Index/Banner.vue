@@ -2,7 +2,7 @@
     <el-row :gutter="20" style="box-sizing: border-box; margin-right: 0px;">
         <el-col :span="4" :offset="3">
             <ul class="menus is-always-shadow" @mouseleave="hideDetail">
-                <li @mouseenter="showDetail" v-for="(category,index) in categories" :key="index">{{ category.categoryName }}</li>
+                <li @mouseenter="showDetail(index)" v-for="(category,index) in categories1" :key="index">{{ category.categoryName }}</li>
             </ul>
         </el-col>
         <el-col :span="13" style="position: relative;">
@@ -20,29 +20,14 @@
                     <el-image :src="'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg'"></el-image>
                 </el-carousel-item>
             </el-carousel>
-            <div class="detail" @mouseenter="showDetail" @mouseleave="hideDetail" v-show="isShowDetail">
-                <div class="detail-item">
-                    <h3 class="title">电视</h3>
+            <div class="detail" @mouseenter="showDetail(index)" @mouseleave="hideDetail" v-show="isShowDetail">
+                <div class="detail-item" v-for="(category,index) in categories2" :key="index">
+                    <h3 class="title">{{ category.categoryName }}</h3>
                     <div>
-                        <el-link :underline="false" class="item">全面屏电视</el-link> 
-                        <el-link :underline="false" class="item">教育电视</el-link>
-                        <el-link :underline="false" class="item">OLED电视</el-link>
-                        <el-link :underline="false" class="item">智慧屏</el-link>
-                        <el-link :underline="false" class="item">4K超清电视</el-link>
-                        <el-link :underline="false" class="item">55英寸</el-link>
+                        <el-link :underline="false" class="item" v-for="(category,index) in category.categoryList" :key="index">{{category.categoryName}}</el-link>
                     </div>
                 </div>  
-                <div class="detail-item">
-                    <h3 class="title">空调</h3>
-                    <div>
-                        <el-link :underline="false" class="item" @click="toSearch">新风空调</el-link> 
-                        <el-link :underline="false" class="item">以旧换新</el-link>
-                        <el-link :underline="false" class="item">空调柜机</el-link>
-                        <el-link :underline="false" class="item">空调套装</el-link>
-                        <el-link :underline="false" class="item">中央空调</el-link>
-                        <el-link :underline="false" class="item">移动空调空调</el-link>
-                    </div>
-                </div>
+
             </div>
         </el-col>
     </el-row>
@@ -53,13 +38,15 @@ import { getList } from '@/api/category'
 export default {
     data: () => ({
         isShowDetail: false,
-      categories:[]
+      categories1:[],
+      categories2:[]
     }),
     components: {
     },
     methods: {
-        showDetail() {
-            this.isShowDetail = true
+        showDetail(index) {
+            this.isShowDetail = true;
+          this.categories2 = this.categories1[index].categoryList;
         },
         hideDetail() {
             this.isShowDetail = false
@@ -73,7 +60,7 @@ export default {
           let _this = this;
         getList().then(response => {
             window.console.log(response);
-            _this.categories = response.data;
+            _this.categories1 = response.data;
           })
       }
     },
