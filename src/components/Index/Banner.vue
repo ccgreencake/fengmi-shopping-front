@@ -16,7 +16,7 @@
                 <div class="detail-item" v-for="(category,index) in categories2" :key="index">
                     <h3 class="title">{{ category.categoryName }}</h3>
                     <div>
-                        <el-link :underline="false" class="item" v-for="(category,index) in category.categoryList" :key="index">{{category.categoryName}}</el-link>
+                        <el-link @click="toSearch(category.categoryId)" :underline="false" class="item" v-for="(category,index) in category.categoryList" :key="index">{{category.categoryName}}</el-link>
                     </div>
                 </div>  
 
@@ -45,9 +45,12 @@ export default {
         hideDetail() {
             this.isShowDetail = false
         },
-        toSearch(){
+        toSearch(categoryId){
             this.$router.push({
-                path:'/search'
+                path:'/search',
+                query:{
+                    categoryId
+                }
             })
         },
       getCategory(){

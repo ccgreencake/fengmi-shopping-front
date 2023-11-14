@@ -6,3 +6,9 @@ export function getProductList() {
     method: 'get'
   })
 }
+export function getProductByCategory(categoryId, pageNum, pageSize) {
+  return request({
+    url:`/products/category/${categoryId}/${pageNum}/${pageSize}`,
+    method:'get'
+  })
+}
