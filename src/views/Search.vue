@@ -14,7 +14,7 @@
                             <span>累计销量：{{product.soldNum}}</span>
                             <div class="bottom clearfix">
                                 <time class="time">{{ product.createTime }}</time>
-                                <el-button type="text" size="small" @click="toDetail">操作按钮</el-button>
+                                <el-button type="text" size="small" @click="toDetail(product.productId)">操作按钮</el-button>
                             </div>
                         </div>
                     </el-card>
@@ -57,8 +57,13 @@
         }
       },
       methods:{
-        toDetail:function(){
-            this.$router.push('/detail')
+        toDetail:function(productId){
+            this.$router.push({
+              path: '/detail',
+              query: {
+                productId
+              }
+            })
         },
         getProduct(categoryId,pageNum,pageSize){
             let _this = this;

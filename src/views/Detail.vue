@@ -6,7 +6,8 @@
     <el-row type="flex" class="row-bg" justify="center" style="font-size:14px">
       <el-col :span="6">
         <div style="width:300px;height:300px;">
-          <img src="@/img/wwxb_1.png" alt="好吃的零食" width="300px" height="300px">
+<!--          <img src="@/img/wwxb_1.png" alt="好吃的零食" width="300px" height="300px">-->
+          <el-image :src="'http://localhost:8080/img/'+productDetail.productImg[0].url"></el-image>
         </div>
       </el-col>
       <el-col :span="8">
@@ -14,12 +15,12 @@
           <br> 
           <div style="margin-bottom:30px">
             <span>
-              <h1>旺旺雪饼</h1>
+              <h1>{{productDetail.product.productName}}</h1>
             </span>
           </div>
           <div style="background-color:#e8e8e8;margin:10px 0px;padding:20px 0px">
-            <span>&nbsp;&nbsp;&nbsp;促销价:<span style="font-size:18px; color:red;margin-left:10px">¥10</span></span><br><br>
-            <span>&nbsp;&nbsp;&nbsp;原&nbsp;&nbsp;&nbsp;价:<span style="font-size:18px; text-decoration: line-through;margin-left:10px">¥30</span></span>
+            <span>&nbsp;&nbsp;&nbsp;促销价:<span style="font-size:18px; color:red;margin-left:10px">{{productDetail.productSku[0].sellPrice}}</span></span><br><br>
+            <span>&nbsp;&nbsp;&nbsp;原&nbsp;&nbsp;&nbsp;价:<span style="font-size:18px; text-decoration: line-through;margin-left:10px">{{productDetail.productSku[0].originalPrice}}</span></span>
           </div>
           <div>
             <label>&nbsp;&nbsp;&nbsp;口味:&nbsp;&nbsp;&nbsp;</label>
@@ -65,47 +66,47 @@
           <el-row>
             <el-col :span="12">
               <span>产地:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">武汉</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].productPlace}}</el-tag>
             </el-col>
             <el-col :span="12">
               <span>保质期:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">36个月</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].footPeriod}}</el-tag>
             </el-col>
           </el-row><br>
           <el-row>
             <el-col :span="12">
               <span>品牌:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">旺旺品牌</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].brand}}</el-tag>
             </el-col>
             <el-col :span="12">
               <span>生产公司:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">旺旺</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].factoryName}}</el-tag>
             </el-col>
           </el-row><br>
           <el-row>
             <el-col :span="12">
               <span>公司地址:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">xxxxxxxxx</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].factoryAddress}}</el-tag>
             </el-col>
             <el-col :span="12">
               <span>包装:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">xxxxxxxxx</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].packagingMethod}}</el-tag>
             </el-col>
           </el-row><br>
           <el-row>
             <el-col :span="12">
               <span>重量:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">100g</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].weight}}</el-tag>
             </el-col>
             <el-col :span="12">
               <span>保存方式:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">袋装</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].storageMethod}}</el-tag>
             </el-col>
           </el-row><br>
           <el-row>
             <el-col :span="12">
               <span>使用方式:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <el-tag type="success">直接食用</el-tag>
+              <el-tag type="success">{{productDetail.productParams[0].eatMethod}}</el-tag>
             </el-col>
             <el-col :span="12">
             </el-col>
@@ -122,9 +123,9 @@
               <div class="block">
                 <el-timeline>
                   <el-timeline-item placement="top">
-                    <el-card>
-                      <p>用户ID为的用户说:</p><br>
-                      <h1>&nbsp;&nbsp;&nbsp;&nbsp;好吃的零食</h1>
+                    <el-card v-for="(comment,index) in productDetail.productComments" :key="index">
+                      <p>用户ID为{{comment.commId}}的用户说:</p><br>
+                      <h1>&nbsp;&nbsp;&nbsp;&nbsp;{{ comment.commContent }}</h1>
                     </el-card>
                   </el-timeline-item>
                 </el-timeline>
@@ -153,6 +154,7 @@
   import Header from '@/components/Index/Header'
   import SearchBar from '@/components/Index/SearchBar'
   import Footer from '@/components/Index/Footer'
+  import { getProductDetail } from '@/api/product'
 
   export default {
       components: {
@@ -164,7 +166,9 @@
       return {
         guige: 5,
         kouwei:'微辣',
-        num:1
+        num:1,
+        productId:'',
+        productDetail:[],
       }
     },
     methods: {
@@ -178,9 +182,22 @@
           this.$router.push({
             path:'/my-cart'
           })
-        }
+        },
+      getProduct(productId){
+        let _this = this;
+        getProductDetail(productId).then(response => {
+          window.console.log(response.data);
+          _this.productDetail = response.data;
+        })
+      }
+
     },
-    computed: {
+    mounted() {
+      let productId = this.$route.query.productId;
+      this.productId = productId;
+      // eslint-disable-next-line no-console
+      // console.log(this.productId);
+      this.getProduct(this.productId);
     }
   }
 </script>
