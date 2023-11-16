@@ -8,7 +8,7 @@
                     <span>{{ product.productName }}</span>
                     <div class="bottom clearfix">
                         <time class="time">{{ product.updateTime }}</time>
-                        <el-button type="text" class="button">操作按钮</el-button>
+                        <el-button type="text" class="button" @click="toDetail(product.productId)">操作按钮</el-button>
                     </div>
                 </div>
             </el-card>
@@ -25,6 +25,14 @@ export default {
         products:[]
     }),
     methods:{
+      toDetail:function(productId){
+        this.$router.push({
+          path: '/detail',
+          query: {
+            productId
+          }
+        })
+      },
        getProduct(){
          let _this = this;
          getProductList().then(response => {

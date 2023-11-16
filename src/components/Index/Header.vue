@@ -3,7 +3,7 @@
       <el-col :span="6" :offset="1">
         <router-link to="/">
           <h3 style="color: #fff; font-weight: 600; font-size: 18px;">
-            <i class="fa fa-fort-awesome" style="font-size: 24px;"></i>&nbsp;&nbsp; 2167商城
+            <i class="fa fa-fort-awesome" style="font-size: 24px;"></i>&nbsp;&nbsp; 商城
           </h3>
         </router-link>
       </el-col>
