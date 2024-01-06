@@ -1,5 +1,5 @@
 <template>
-    <el-row type="flex" align="middle" style="margin-top: 10px;">
+    <el-row type="flex" align="middle" style=" margin-top: 10px;">
         <el-col :span="13" :offset="4">
             <el-input>
                 <i class="fa fa-search" slot="append"></i>

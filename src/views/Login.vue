@@ -30,7 +30,7 @@
                             </el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="danger" style="width: 100%;">登录</el-button>
+                            <el-button type="danger" @click.prevent="loginUser" style="width: 100%;">登录</el-button>
                         </el-form-item>
                         <el-divider></el-divider>
                         <el-form-item style="margin-bottom: 0;">
@@ -56,6 +56,8 @@
 <script>
 import Footer from '@/components/Index/Footer'
 import CommonHeader from '@/components/CommonHeader'
+import {login} from '@/api/user'
+
 
 export default {
     components: {
@@ -67,7 +69,28 @@ export default {
             username: '',
             password: ''
         }
-    })
+    }),
+  methods:{
+      loginUser:function(){
+        login(this.loginForm).then(resp => {
+            if (resp.code == 200){
+              localStorage.setItem("token",resp.data.token);
+              localStorage.setItem("userId",resp.data.userId);
+              localStorage.setItem("username",resp.data.username);
+              // localStorage.setItem("username",this.loginForm.username);
+              let Page = sessionStorage.getItem("Page");
+              if (Page){
+                sessionStorage.removeItem("Page");
+                this.$router.push(Page);
+              }else {
+                this.$router.push("/");
+              }
+            }else {
+              this.$message.error(resp.msg)
+            }
+        })
+      }
+  }
 }
 </script>
 

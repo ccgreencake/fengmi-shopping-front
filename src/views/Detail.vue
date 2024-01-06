@@ -7,7 +7,7 @@
       <el-col :span="6">
         <div style="width:300px;height:300px;">
 <!--          <img src="@/img/wwxb_1.png" alt="好吃的零食" width="300px" height="300px">-->
-          <el-image :src="'http://localhost:8080/img/'+productDetail.productImg[0].url"></el-image>
+          <el-image :src="'  http://localhost:8080/img/'+productDetail.productImg[0].url"></el-image>
         </div>
       </el-col>
       <el-col :span="8">
@@ -21,14 +21,14 @@
           <div style="background-color:#e8e8e8;margin:10px 0px;padding:20px 0px">
             <span>&nbsp;&nbsp;&nbsp;促销价:
               <span v-if="productSku && productSku.length > 0" style="font-size:18px; color:red;margin-left:10px">
-                {{guige.sellPrice}}
+                {{guige.sellPrice}} 元
               </span>
               <span v-else style="font-size:18px; color:red;margin-left:10px">暂无报价</span>
             </span>
             <br><br>
             <span>&nbsp;&nbsp;&nbsp;原&nbsp;&nbsp;&nbsp;价:
               <span v-if="productSku && productSku.length > 0" style="font-size:18px; text-decoration: line-through;margin-left:10px">
-                  {{ guige.originalPrice }}
+                  {{ guige.originalPrice }} 元       
               </span>
               <span v-else style="font-size:18px; text-decoration: line-through;margin-left:10px">
                   暂无报价
@@ -67,15 +67,13 @@
           <div v-if="packagings && packagings.length > 0">
             <label>&nbsp;&nbsp;&nbsp;包装:&nbsp;&nbsp;&nbsp;</label>
             <el-radio-group v-model="baozhuang">
-              <el-radio-button  :label="packing" v-for="packing in packagings" :key="packing" >{{packing}}</el-radio-button>
+              <el-radio-button  :label="packing" v-for="packing in packagings" :key="packing">{{packing}}</el-radio-button>
             </el-radio-group>
           </div>
           <div v-else>
             <label>&nbsp;&nbsp;&nbsp;包装:&nbsp;&nbsp;&nbsp;</label>
             <el-radio-group v-model="baozhuang">
-              <el-radio-button label="5">5袋</el-radio-button>
-              <el-radio-button label="50">50袋</el-radio-button>
-              <el-radio-button label="200">200袋</el-radio-button>
+              <el-radio-button>默认包装</el-radio-button>
             </el-radio-group>
           </div><br>
           <div>
@@ -192,7 +190,7 @@
 </template>
 
 <script>
-  import Header from '@/components/Index/Header'
+  import  Header from '@/components/Index/Header'
   import SearchBar from '@/components/Index/SearchBar'
   import Footer from '@/components/Index/Footer'
   import { getProductDetail } from '@/api/product'
@@ -206,6 +204,8 @@
       },
     data() {
       return {
+        packing:"",
+        flavor:"",
         productId:'',
         productDetail:[],
         productImg:[],
@@ -218,7 +218,16 @@
         packagings: [],
         baozhuang:"",
         kouwei:"",
-        guige:[]
+        guige:[],
+        shoppingCart: {
+          productId: '',
+          userId: '',
+          cartNum: '',
+          skuId: '',
+          cartTime: '',
+          productPrice: '',
+          skuProps: '',
+        }
       }
     },
     methods: {
@@ -229,7 +238,32 @@
         minus:function(){
           this.num--;
         },
+        fDate:function(date) {
+          var year = date.getFullYear();
+          var month = ("0" + (date.getMonth() + 1)).slice(-2);
+          var day = ("0" + date.getDate()).slice(-2);
+          var hour = ("0" + date.getHours()).slice(-2);
+          var minute = ("0" + date.getMinutes()).slice(-2);
+          var second = ("0" + date.getSeconds()).slice(-2);
+          return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+        },
         join:function(){
+          this.shoppingCart.productId = this.productId;
+          if(this.kouwei == "" || this.kouwei == null){
+            this.kouwei = "默认口味";
+          }
+          if(this.baozhuang == "" || this.baozhuang == null){
+            this.baozhuang = "默认包装";
+          }
+          this.shoppingCart.skuProps += "口味:" + this.kouwei + ";";
+          this.shoppingCart.skuProps += "包装:" + this.baozhuang + ";";
+          this.shoppingCart.cartNum = this.num;
+          this.shoppingCart.skuId = this.guige.skuId;
+          this.shoppingCart.productPrice = this.guige.sellPrice * this.num;
+          this.shoppingCart.cartTime = this.fDate(new Date());
+          this.shoppingCart.userId = localStorage.getItem("userId");
+          sessionStorage.setItem("Page","/my-cart");
+          localStorage.setItem("shoppingCart",JSON.stringify(this.shoppingCart));
           this.$router.push({
             path:'/my-cart'
           })
@@ -237,7 +271,6 @@
       getProduct(productId){
         let _this = this;
         getProductDetail(productId).then(response => {
-          window.console.log(response.data);
           _this.productDetail = response.data;
           _this.productImg = response.data.productImg;
           _this.productSku = response.data.productSku;

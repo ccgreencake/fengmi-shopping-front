@@ -18,10 +18,10 @@
                             type="text">新增收货地址</el-button>
                     </div>
                     <div style="font-size: 14px;">
-                        <div class="address-info">
-                            <span class="mr10">张三</span> 
-                            <span class="mr10">湖北省武汉市江夏区金融港路 B18 栋</span>
-                            <span>1300008876</span>
+                        <div class="address-info" v-for="(CommonAddr,index) in CommonAddrs" :key="index">
+                            <span class="mr10">{{CommonAddr.receiverName}}</span>
+                            <span class="mr10">{{CommonAddr.province}}省{{CommonAddr.city}}市{{CommonAddr.area}}{{CommonAddr.addr}}</span>
+                            <span>{{ CommonAddr.receiverMobile }}</span>
                             <el-button type="text" class="edit-btn">编辑</el-button>
                             <span type="info" class="default-address mr10">默认</span>
                         </div>
@@ -29,23 +29,11 @@
                             展示更多
                             <i class="fa fa-angle-double-down"></i>
                         </el-button>
-                        <div v-if="!showMore">
-                            <div class="address-info">
-                                <span class="mr10">张三</span> 
-                                <span class="mr10">湖北省武汉市江夏区金融港路 B18 栋</span>
-                                <span>1300008876</span>
-                                <el-button type="text" class="edit-btn">编辑</el-button>
-                            </div>
-                            <div class="address-info">
-                                <span class="mr10">张三</span> 
-                                <span class="mr10">湖北省武汉市江夏区金融港路 B18 栋</span>
-                                <span>1300008876</span>
-                                <el-button type="text" class="edit-btn">编辑</el-button>
-                            </div>
-                            <div class="address-info">
-                                <span class="mr10">张三</span> 
-                                <span class="mr10">湖北省武汉市江夏区金融港路 B18 栋</span>
-                                <span>1300008876</span>
+                        <div v-if="!showMore" >
+                            <div class="address-info" v-for="(UnCommonAddr,index) in UnCommonAddrs" :key="index">
+                                <span class="mr10">{{UnCommonAddr.receiverName}}</span>
+                                <span class="mr10">{{UnCommonAddr.province}}省{{UnCommonAddr.city}}市{{UnCommonAddr.area}}{{UnCommonAddr.addr}}</span>
+                                <span>{{ UnCommonAddr.receiverMobile }}</span>
                                 <el-button type="text" class="edit-btn">编辑</el-button>
                             </div>
                         </div>
@@ -62,20 +50,27 @@
                 <el-table-column label="商品">
                     <template slot-scope="scope">
                         <div class="item">
-                            <el-image class="item-pic" :src="scope.row.pic"></el-image>
+                            <el-image class="item-pic" :src="'http://localhost:8080/img/'+scope.row.productImg.url"></el-image>
                             <p class="item-title">
-                                {{scope.row.title}}
+                                {{scope.row.productSku.skuName}}
                             </p>
                         </div> 
                     </template>
                 </el-table-column>
-                <el-table-column label="单价" prop="price" width="120"></el-table-column>
-                <el-table-column label="数量" prop="num">
+              <el-table-column label="规格">
+                <template slot-scope="scope">
+                              <span style="font-weight: 600">
+                                      {{scope.row.skuProps}}
+                              </span>
+                </template>
+              </el-table-column>
+                <el-table-column label="单价" prop="productSku.sellPrice" width="120"></el-table-column>
+                <el-table-column label="数量" prop="cartNum">
                 </el-table-column>
                 <el-table-column label="小计">
                 <template slot-scope="scope">
                     <span style="font-weight: 600">
-                            ￥{{scope.row.price * scope.row.num}}
+                            ￥{{scope.row.productPrice}}
                     </span> 
                     </template> 
                 </el-table-column>
@@ -83,8 +78,8 @@
             <el-card class="settle-info">
                 <div>
                     <p class="tr">
-                        <span class="info">2</span> 件商品, 应付总额: 
-                        <span class="info">￥3000</span></p>
+                        <span class="info">{{carts.length}}</span> 件商品, 应付总额:
+                        <span class="info">{{totalPrice}}</span></p>
                     <br>
                     <p class="tr">
                         寄送至： 湖北武汉市江夏区金融港B18栋 收货人：张三 13078909888
@@ -104,13 +99,22 @@
 import CommonHeader from '@/components/CommonHeader'
 import Header from '@/components/Index/Header'
 import EditAddress from '@/components/Settle/EditAddress'
+import {getAddrListUnCommon,getAddrListCommon} from '@/api/UserAddr'
 
 export default {
     components: {
         CommonHeader,
         Header,
-        EditAddress
+        EditAddress,
     },
+    data: () => ({
+      showMore: true,
+      carts: [],
+      userId: '',
+      totalPrice: 0,
+      UnCommonAddrs:[],
+      CommonAddrs:[]
+    }),
     methods: {
         showEditDialog() {
             this.$refs.editDialog.showEditDialog = true
@@ -119,29 +123,31 @@ export default {
             this.$router.push({
                 path:'/my-order'
             })
+        },
+        getAddrListUnCommon:function (){
+            getAddrListUnCommon(this.userId).then(response => {
+                this.UnCommonAddrs = response.data;
+                window.console.log(this.UnCommonAddrs);
+            })
+        },
+        getAddrListCommon:function (){
+            getAddrListCommon(this.userId).then(response => {
+                this.CommonAddrs = response.data;
+                window.console.log(this.CommonAddrs);
+            })
         }
     },
-    data: () => ({
-        showMore: true,
-        carts: [
-            {
-                id: 1,
-                pic: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
-                title: '罗莱家纺 冰丝席凉席夏凉软席子空调席双人',
-                num: 2,
-                name: '张三',
-                price: 99.0
-            },
-            {
-                id: 2,
-                pic: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
-                title: '罗莱家纺 冰丝席凉席夏凉软席子空调席双人',
-                num: 3,
-                name: '张三',
-                price: 99.0
-            }
-        ]
-    })
+
+    mounted:function () {
+        this.carts = JSON.parse(sessionStorage.getItem("shoppingCartSettle"));
+        this.userId =  this.$route.query.userId;
+        //计算订单总金额
+        for(var i = 0 ; i < this.carts.length;i++){
+          this.totalPrice += this.carts[i].productPrice;
+        }
+        this.getAddrListUnCommon();
+        this.getAddrListCommon();
+      }
 }
 </script>
 

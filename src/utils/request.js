@@ -11,13 +11,18 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
   config => {
+      config.headers.token = localStorage.getItem("token");
     return config
   }
 )
-
+import router from '@/router/index.js'
 // response interceptor
 service.interceptors.response.use(
   response => {
+      if (response.data.code == 403){
+          localStorage.removeItem("token");
+          router.push('/login')
+      }
     return response.data
   }
 )

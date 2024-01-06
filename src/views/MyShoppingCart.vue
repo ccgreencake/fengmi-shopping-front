@@ -10,7 +10,7 @@
         <div>
             <el-row>
                 <el-col :span="18" :offset="3">
-                    <span class="all-goods">全部商品: 2</span>
+                    <span class="all-goods">全部商品: {{carts.length}}</span>
                 </el-col>
                 <el-col :span="18" :offset="3">
                     <el-table
@@ -18,57 +18,51 @@
                         style="width: 100%"
                         @selection-change="handleSelectionChange"
                     >
-                        <el-table-column 
-                            width="80" 
-                            type="selection" 
-                            @selection-change="handleSelectionChange" 
+                        <el-table-column
+                            width="80"
+                            type="selection"
+                            @selection-change="handleSelectionChange"
                             label="全选">
                         </el-table-column>
                         <el-table-column label="商品">
                             <template slot-scope="scope">
                                 <div class="item">
-                                    <el-image class="item-pic" :src="scope.row.pic"></el-image>
+                                    <el-image class="item-pic" :src="'http://localhost:8080/img/'+scope.row.productImg.url"></el-image>
                                     <p class="item-title">
-                                        {{scope.row.title}}
+                                        {{scope.row.productSku.skuName}}
                                     </p>
                                 </div> 
                             </template>
                         </el-table-column>
-                        <el-table-column label="单价" prop="price" width="120"></el-table-column>
-                        <el-table-column label="数量" prop="num">
-                            <template slot-scope="scope">
-                                <el-button type="info" size="mini" style="margin-right: 3px;">
-                                    <i class="fa fa-minus"></i>
-                                </el-button>
-                                <el-input size="small" style="width: 80px;" v-model="scope.row.num"></el-input> 
-                                <el-button style="margin-left: 3px;" type="info" size="mini">
-                                    <i class="fa fa-plus"></i>
-                                </el-button>
-                            </template>
+                        <el-table-column label="规格">
+                          <template slot-scope="scope">
+                              <span style="font-weight: 600">
+                                      {{scope.row.skuProps}}
+                              </span>
+                          </template>
                         </el-table-column>
-                        <el-table-column label="小计">
+                        <el-table-column label="单价" prop="productSku.sellPrice" width="80"></el-table-column>
+                        <el-table-column label="数量" prop="cartNum" width="80"></el-table-column>
+                        <el-table-column label="小计" width="80">
                         <template slot-scope="scope">
                             <span style="font-weight: 600">
-                                    ￥{{scope.row.price * scope.row.num}}
+                                    ￥{{scope.row.productPrice}}
                             </span> 
                             </template> 
                         </el-table-column>
                         <el-table-column label="操作">
-                            <template>
-                                <el-button type="text">删除</el-button>
+                            <template slot-scope="scope">
+                                <el-button type="text" @click="deleteShoppingCart(scope.row.cartId)">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
                     <el-card style="margin-top: 10px;">
                         <div>
-                            <el-checkbox>全选</el-checkbox>
-                            <el-button type="text" style="margin-left: 10px;">删除选中的商品</el-button>
-                            <router-link to="/settle">
-                                 <el-button type="danger" style="float: right;">去结算</el-button>
-                            </router-link>
-                            <p style="float: right; margin-right: 10px;">
-                                已选择 <span style="color: #e2231a; font-weight: 600;">0</span> 件商品
-                                总价: <span style="color: #e2231a; font-weight: 600;">￥0.00</span>
+                            <el-button type="text" style="margin-left: 10px;" @click="deleteShoppingCartBySelect()">删除选中的商品</el-button>
+                            <el-button type="danger" style="float: right;" @click="toSettle">去结算</el-button>
+                          <p style="float: right; margin-right: 10px;">
+                                已选择 <span style="color: #e2231a; font-weight: 600;">{{selectShopping.length}}</span> 件商品
+                                总价: <span style="color: #e2231a; font-weight: 600;">￥{{ totalPrice }}</span>
                             </p>
                         </div>
                     </el-card>
@@ -81,6 +75,7 @@
 <script>
 import CommonHeader from '../components/CommonHeader.vue'
 import Header from '@/components/Index/Header'
+import {addShoppingCart,getShoppingCartByUserId,deleteShoppingCart,deleteShoppingCartBySelect} from '@/api/MyShoppingCart'
 export default {
     components: {
         CommonHeader,
@@ -88,59 +83,86 @@ export default {
     },
     data: () => ({
         checkAll: false,
-        carts: [
-            {
-                id: 1,
-                pic: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
-                title: '罗莱家纺 冰丝席凉席夏凉软席子空调席双人',
-                num: 2,
-                name: '张三',
-                price: 99.0
-            },
-            {
-                id: 2,
-                pic: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
-                title: '罗莱家纺 冰丝席凉席夏凉软席子空调席双人',
-                num: 3,
-                name: '张三',
-                price: 99.0
-            },
-            {
-                id: 3,
-                pic: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
-                title: '罗莱家纺 冰丝席凉席夏凉软席子空调席双人',
-                num: 3,
-                name: '张三',
-                price: 99.0
-            },
-            {
-                id: 4,
-                pic: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
-                title: '罗莱家纺 冰丝席凉席夏凉软席子空调席双人',
-                num: 3,
-                name: '张三',
-                price: 99.0
-            },
-            {
-                id: 5,
-                pic: 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg',
-                title: '罗莱家纺 冰丝席凉席夏凉软席子空调席双人',
-                num: 3,
-                name: '张三',
-                price: 99.0
-            }
-        ]
+        carts: [],
+      shoppingCart: [],
+      userId: '',
+      selectShopping: [],
+      totalPrice: 0,
     }),
     methods: {
-        // 选中所有
-        changeCheckAll(val) {
-            window.console.log(val);
+        toSettle() {
+          if (this.selectShopping.length) {
+            sessionStorage.setItem("shoppingCartSettle", JSON.stringify(this.selectShopping));
+            this.$router.push({
+              path: "/settle",
+              query: {
+                userId: this.userId
+              }
+            });
+          }else{
+            this.$message.error("至少选择一件商品");
+          }
         },
         // 勾选某件商品val
         handleSelectionChange(val) {
+            this.selectShopping = val;
             window.console.log(val);
+            window.console.log("id:"+this.selectShopping)
+            this.checkPrice();
+        },
+        checkPrice(){
+          this.totalPrice = 0;
+          for (let i = 0 ; i < this.selectShopping.length ; i++) {
+            this.totalPrice += this.selectShopping[i].productPrice;
+          }
+        },
+        // 删除勾选商品
+        deleteShoppingCartBySelect(){
+          if(this.selectShopping.length){
+            deleteShoppingCartBySelect(this.selectShopping).then(res =>{
+              if(res.code == 200){
+                this.$message.success(res.msg);
+                this.getShoppingCart();
+              }
+            })
+          }else{
+            this.$message.error("至少选择一件商品");
+          }
+
+
+        },
+        addShoppingCart:function(){
+          let _this = this;
+          addShoppingCart(this.shoppingCart).then(response => {
+            window.console.log(response.msg)
+            localStorage.removeItem("shoppingCart");
+            _this.getShoppingCart();
+          })
+        },
+        getShoppingCart:function(){
+          getShoppingCartByUserId(this.userId).then(response => {
+            // window.console.log(response.data)
+            this.carts = response.data;
+            window.console.log(this.carts)
+          })
+        },
+        deleteShoppingCart(cartId){
+          // window.console.log(cartId)
+          deleteShoppingCart(cartId).then(response => {
+            window.console.log(response.msg)
+            this.getShoppingCart();
+          })
         }
-    }
+    },
+  mounted:function (){
+      this.shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"));
+      this.userId = localStorage.getItem("userId");
+      if(this.shoppingCart ) {
+        this.addShoppingCart();
+      }else {
+        this.getShoppingCart();
+      }
+  }
 }
 </script>
 
